@@ -2,6 +2,8 @@ package server
 
 import (
 	v1 "server-data/api/helloworld/v1"
+	validation "server-data/api/validation"
+
 	"server-data/internal/conf"
 	"server-data/internal/service"
 
@@ -11,7 +13,10 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server,
+	greeter *service.GreeterService,
+	validationServer *service.ValidationService,
+	logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -28,5 +33,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 	}
 	srv := grpc.NewServer(opts...)
 	v1.RegisterGreeterServer(srv, greeter)
+	validation.RegisterValidationServer(srv, validationServer)
 	return srv
 }
